@@ -41,11 +41,7 @@ function getMiddleValueOfUpdate(update: number[]): number {
   return update[middle];
 }
 
-let total = 0;
-
-for (const update of updates) {
-  const middle = getMiddleValueOfUpdate(update);
-
+function validateUpdate(update: number[]): boolean {
   let valid = true;
 
   for (let i = 0; i < update.length; i++) {
@@ -64,7 +60,65 @@ for (const update of updates) {
     }
   }
 
+  return valid;
+}
+
+let total = 0;
+
+const incorrectUpdates: number[][] = [];
+
+for (const update of updates) {
+  const middle = getMiddleValueOfUpdate(update);
+
+  let valid = validateUpdate(update);
+
   if (valid) total += middle;
+  else incorrectUpdates.push(update);
+}
+
+console.log(total);
+
+// part 2
+
+function correctInvalidUpdate(update: number[]): number[] {
+  const newUpdate: number[] = [];
+
+  for (let i = 0; i < update.length; i++) {
+    const value = update[i];
+
+    if (i > 0) {
+      for (let j = 0; j < newUpdate.length; j++) {
+        // place the value in the next position and check if it's valid
+
+        const newUpdateCopy = [...newUpdate];
+        newUpdateCopy.splice(j, 0, value);
+
+        if (validateUpdate(newUpdateCopy)) {
+          newUpdate.splice(j, 0, value);
+          break;
+        }
+
+        if (j === newUpdate.length - 1) {
+          newUpdate.push(value);
+          break;
+        }
+      }
+    } else {
+      newUpdate.push(value);
+    }
+  }
+
+  return newUpdate;
+}
+
+total = 0;
+
+for (const update of incorrectUpdates) {
+  const newUpdate = correctInvalidUpdate(update);
+  
+  const middle = getMiddleValueOfUpdate(newUpdate);
+
+  total += middle;
 }
 
 console.log(total);
