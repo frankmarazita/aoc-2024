@@ -21,10 +21,9 @@ for (const line of lines) {
   equations.push({ testValue, numbers });
 }
 
-type Operators = "+" | "*";
-const operators: Operators[] = ["+", "*"];
+type Operators = "+" | "*" | "||";
 
-function couldEquationBeTrue(equation: Equation) {
+function couldEquationBeTrue(equation: Equation, operatorSet: Operators[]) {
   let operationPermutations: Operators[][] = [];
 
   function generatePermutations(operators: Operators[], numbers: number[]) {
@@ -33,7 +32,7 @@ function couldEquationBeTrue(equation: Equation) {
       return;
     }
 
-    for (const op of ["+", "*"] as Operators[]) {
+    for (const op of operatorSet) {
       generatePermutations([...operators, op], numbers);
     }
   }
@@ -41,17 +40,19 @@ function couldEquationBeTrue(equation: Equation) {
   generatePermutations([], equation.numbers);
 
   function calculate(numbers: number[], ops: string[]) {
-    let result = numbers[0];
+    let resultString = numbers[0].toString();
 
     for (let i = 0; i < ops.length; i++) {
       if (ops[i] === "+") {
-        result += numbers[i + 1];
+        resultString = String(Number(resultString) + numbers[i + 1]);
+      } else if (ops[i] === "*") {
+        resultString = String(Number(resultString) * numbers[i + 1]);
       } else {
-        result *= numbers[i + 1];
+        resultString += numbers[i + 1];
       }
     }
 
-    return result;
+    return Number(resultString);
   }
 
   let isTrue = false;
@@ -67,7 +68,7 @@ function couldEquationBeTrue(equation: Equation) {
 }
 
 const trueEquations = equations.filter((equation) => {
-  return couldEquationBeTrue(equation);
+  return couldEquationBeTrue(equation, ["+", "*"]);
 });
 
 let trueTestValueTotal = 0;
@@ -77,3 +78,17 @@ for (const equation of trueEquations) {
 }
 
 console.log(trueTestValueTotal);
+
+// part 2
+
+const trueEquations2 = equations.filter((equation) => {
+  return couldEquationBeTrue(equation, ["+", "*", "||"]);
+});
+
+let trueTestValueTotal2 = 0;
+
+for (const equation of trueEquations2) {
+  trueTestValueTotal2 += equation.testValue;
+}
+
+console.log(trueTestValueTotal2);
