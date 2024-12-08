@@ -48,6 +48,20 @@ function getNextRelativePosition(
 
 const antinodes: Set<string> = new Set();
 
+function printAntinodes(antinodes: Set<string>) {
+  for (let i = 0; i < mapHeight; i++) {
+    let line = "";
+    for (let j = 0; j < mapWidth; j++) {
+      if (antinodes.has(`${j},${i}`)) {
+        line += "#";
+      } else {
+        line += ".";
+      }
+    }
+    console.log(line);
+  }
+}
+
 for (const [, positions] of data) {
   for (const position of positions) {
     for (const targetPosition of positions) {
@@ -65,3 +79,40 @@ for (const [, positions] of data) {
 }
 
 console.log(antinodes.size);
+
+// printAntinodes(antinodes);
+
+// part 2
+
+antinodes.clear();
+
+for (const [, positions] of data) {
+  for (const position of positions) {
+    for (const targetPosition of positions) {
+      if (position !== targetPosition) {
+        antinodes.add(`${targetPosition[0]},${targetPosition[1]}`);
+
+        let valid = true;
+
+        let positionA = position;
+        let positionB = targetPosition;
+
+        while (valid) {
+          let antinodePosition = getNextRelativePosition(positionA, positionB);
+
+          if (isPositionValid(antinodePosition)) {
+            antinodes.add(`${antinodePosition[0]},${antinodePosition[1]}`);
+            positionA = positionB;
+            positionB = antinodePosition;
+          } else {
+            valid = false;
+          }
+        }
+      }
+    }
+  }
+}
+
+console.log(antinodes.size);
+
+// printAntinodes(antinodes);
